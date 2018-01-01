@@ -1,9 +1,9 @@
 from DB import DB
-
 from App import app
 
 from itsdangerous import (TimedJSONWebSignatureSerializer as Ser,
                             BadSignature, SignatureExpired)
+from passlib.hash import bcrypt
 
 serializer = Ser(app.config['SECRET_KEY'], expires_in=9000)
 
@@ -20,7 +20,7 @@ class User(DB.Model):
         self.name = rn
         self.username = un
         self.email = em
-        self.password_hash = pw # TODO hash it
+        self.password_hash = bcrypt.hash(pw)
         self.m_roles = "USER"
 
     @property
@@ -42,8 +42,7 @@ class User(DB.Model):
         self.roles = self.roles + [role.upper()]
 
     def authorize(self, pw):
-        # TODO hash it
-        return pw == self.password_hash
+        return bcrypt.verify(pw, self.password_hash)
 
     def generate_auth_token(self):
         return serializer.dumps({'id': self.id}).decode('ascii')
