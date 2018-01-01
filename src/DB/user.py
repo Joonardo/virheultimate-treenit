@@ -5,7 +5,7 @@ from App import app
 from itsdangerous import (TimedJSONWebSignatureSerializer as Ser,
                             BadSignature, SignatureExpired)
 
-serializer = Ser(app.config['SECRET_KEY'], expires_in=900)
+serializer = Ser(app.config['SECRET_KEY'], expires_in=9000)
 
 class User(DB.Model):
     __tablename__ = 'users'
@@ -29,14 +29,17 @@ class User(DB.Model):
 
     @roles.setter
     def roles(self, nroles):
-        if all(not ',' in r for r in nroles):
+        if any(',' in r for r in nroles):
             return
-        self.m_roles = ','.join(nroles)
+        self.m_roles = ','.join(set(nroles))
+
+    def remove_role(self, role):
+        self.roles = [r for r in self.roles if r != role.upper()]
 
     def add_role(self, role):
         if "," in role:
             return
-        self.roles = self.roles + [role]
+        self.roles = self.roles + [role.upper()]
 
     def authorize(self, pw):
         # TODO hash it

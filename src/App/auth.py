@@ -2,6 +2,7 @@ from App import app
 import DB
 
 from flask import request, jsonify, g
+from functools import wraps
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -21,6 +22,8 @@ def login():
 
 def required(fn):
     def wrapper(*args, **kwargs):
+        if not 'Authorization' in request.headers:
+            return "Unauthorized", 403
         u = DB.User.verify_auth_token(request.headers['Authorization'])
         if not u:
             return "Unauthorized", 403
@@ -30,6 +33,7 @@ def required(fn):
 
 def requires_role(role):
     def decorator(fn):
+        @wraps(fn)
         @required
         def wrapper(*args, **kwargs):
             if not role.upper() in g.user.roles:
@@ -41,7 +45,7 @@ def requires_role(role):
 
 @app.route('/api/login/test', methods=['GET'])
 @required
-def test_user():
+def test():
     return "Hello, {:s}".format(g.user.username)
 
 @app.route('/api/login/test/user', methods=['GET'])
