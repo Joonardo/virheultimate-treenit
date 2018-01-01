@@ -31,5 +31,5 @@ class Event(DB.Model):
             'name': self.name,
             'description': self.description,
             'users_in': self.users_in,
-            'users_out': self.users_out
+            'users_out': self.users_out,
         }
