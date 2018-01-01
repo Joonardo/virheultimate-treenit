@@ -1,15 +1,17 @@
 import DB
+from App import auth
+
 from flask_restful import Resource
 from flask import request
 
 class Users(Resource):
+
+    @auth.required
     def get(self):
         return [u.dict() for u in DB.User.query.all()]
 
+    @auth.requires_role('admin')
     def post(self):
-        # TODO some authorization
-        # perhaps add roles to user and allow only admin to
-        # use this endpoint
         data = request.get_json()
         if not ('name' in data and 'username' in data and 'email' in data and 'password' in data):
             return {'error': 'missing required information'}
@@ -19,5 +21,6 @@ class Users(Resource):
         return u.dict()
 
 class User(Resource):
+    @auth.required
     def get(self, id):
         return DB.User.query.get(id).dict()
