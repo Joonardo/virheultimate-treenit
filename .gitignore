@@ -3,3 +3,5 @@ bin
 include
 
 pip-selfcheck.json
+
+**/__pycache__*
