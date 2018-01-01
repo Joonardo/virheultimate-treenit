@@ -1,4 +1,5 @@
 from flask_restful import Resource
+from flask import request
 
 import DB
 
@@ -7,8 +8,10 @@ class Events(Resource):
         return [ev.dict() for ev in DB.Event.query.all()]
 
     def post(self):
-        c = len(DB.Event.query.all())
-        ev = DB.Event('Whoo', 'This is #{:d} event.'.format(c))
+        data = request.get_json()
+        if not ('name' in data and 'description' in data):
+            return {'error': 'missing required information'}
+        ev = DB.Event(data['name'], data['description'])
         DB.DB.session.add(ev)
         DB.DB.session.commit()
         return ev.dict()
