@@ -1,11 +1,11 @@
 from DB import DB
 
-users_in_table = DB.Table(
+users_in_table = DB.Table('users_in_table',
     DB.Column('user_id', DB.Integer, DB.ForeignKey('users.id'), primary_key=True),
     DB.Column('event_id', DB.Integer, DB.ForeignKey('events.id'), primary_key=True)
 )
 
-users_out_table = DB.Table(
+users_out_table = DB.Table('users_out_table',
     DB.Column('user_id', DB.Integer, DB.ForeignKey('users.id'), primary_key=True),
     DB.Column('event_id', DB.Integer, DB.ForeignKey('events.id'), primary_key=True)
 )
@@ -19,7 +19,13 @@ class Event(DB.Model):
                 lazy='subquery', backref=DB.backref('events', lazy='joined'))
     users_out = DB.relationship('User', secondary=users_out_table, lazy='subquery')
 
-    def json(self):
+    def __init__(self, n, desc):
+        self.name = n
+        self.description = desc
+        self.users_in = []
+        self.users_out = []
+
+    def dict(self):
         return {
             'id': self.id,
             'name': self.name,
