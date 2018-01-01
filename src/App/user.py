@@ -23,4 +23,21 @@ class Users(Resource):
 class User(Resource):
     @auth.required
     def get(self, id):
+        if 'admin' in g.user.roles:
+            return g.user.full()
         return DB.User.query.get(id).dict()
+
+    @auth.required
+    def patch(self):
+        data = request.get_json()
+
+        # TODO Allow admin to do some changes
+        if 'admin' in g.user.roles:
+            return DB.query.get(data['id'])
+
+        # Prohibit others from changing profile
+        if g.user.id != data['id']:
+            return {'error': 'Unauthorized'}
+
+        # TODO Allow user to modify his/her profile
+        return g.user.dict()

@@ -46,7 +46,7 @@ class User(DB.Model):
         return pw == self.password_hash
 
     def generate_auth_token(self):
-        return serializer.dumps({'id': self.id}).decode()
+        return serializer.dumps({'id': self.id}).decode('ascii')
 
     @staticmethod
     def verify_auth_token(token):
@@ -64,5 +64,9 @@ class User(DB.Model):
             'name': self.name,
             'username': self.username,
             'email': self.email,
-            'roles': self.roles # TODO remove in production
         }
+
+    def full(self):
+        return {**(self.dict()), **{
+            'roles': self.roles
+        }}
