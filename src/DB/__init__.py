@@ -8,3 +8,5 @@ DB = SQLAlchemy(app)
 
 from .user import User
 from .event import Event
+
+DB.create_all()
