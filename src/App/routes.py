@@ -16,4 +16,4 @@ api.add_resource(Roles, '/api/users/<id>/roles')
 api.add_resource(Event, '/api/events/<id>')
 api.add_resource(Events, '/api/events')
 
-api.add_resource(Attend, '/api/attend/<event_id>')
+api.add_resource(Attend, '/api/events/<event_id>/attend')

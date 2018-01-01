@@ -25,11 +25,21 @@ class Event(DB.Model):
         self.users_in = []
         self.users_out = []
 
+    def status_in(self, user):
+        if user in self.users_out:
+            self.users_out.remove(user)
+        self.users_in.append(user)
+
+    def status_out(self, user):
+        if user in self.users_in:
+            self.users_in.remove(user)
+        self.users_out.append(user)
+
     def dict(self):
         return {
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'users_in': self.users_in,
-            'users_out': self.users_out,
+            'users_in': [u.id for u in self.users_in],
+            'users_out': [u.id for u in self.users_out],
         }
