@@ -2,7 +2,7 @@ import DB
 from App import auth
 
 from flask_restful import Resource
-from flask import request
+from flask import request, g
 
 class Users(Resource):
 
@@ -28,16 +28,34 @@ class User(Resource):
         return DB.User.query.get(id).dict()
 
     @auth.required
-    def patch(self):
+    def patch(self, id):
         data = request.get_json()
 
-        # TODO Allow admin to do some changes
-        if 'admin' in g.user.roles:
-            return DB.query.get(data['id'])
+        # Allow admin to do some changes
+        if 'ADMIN' in g.user.roles:
+            user = DB.User.query.get(id)
+
+            if not user:
+                return {'error': 'invalid user id'}
+
+            user.modify(data)
+
+            DB.DB.session.commit()
+            return user.full()
 
         # Prohibit others from changing profile
-        if g.user.id != data['id']:
-            return {'error': 'Unauthorized'}
+        if g.user.id != int(id):
+            return {'error': 'Unauthorized change'}
 
-        # TODO Allow user to modify his/her profile
+        # Allow user to modify his/her profile
+
+        # Prohibit user from changing some fields
+        denied_keys = ['roles']
+        for key in denied_keys:
+            if key in data:
+                del data[key]
+
+        g.user.modify(data)
+
+        DB.DB.session.commit()
         return g.user.dict()

@@ -41,6 +41,24 @@ class User(DB.Model):
             return
         self.roles = self.roles + [role.upper()]
 
+    def modify(self, data):
+        if 'id' in data:
+            del data['id']
+        if 'password' in data:
+            self.password_hash = bcrypt.hash(data['password'])
+            del data['password']
+
+        if 'name' in data:
+            self.name = data['name']
+        if 'username' in data:
+            self.username = data['username']
+        if 'email' in data:
+            self.email = data['email']
+        if 'roles' in data:
+            self.m_roles = data['roles']
+
+        pass
+
     def authorize(self, pw):
         return bcrypt.verify(pw, self.password_hash)
 
