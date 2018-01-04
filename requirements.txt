@@ -1,6 +1,6 @@
 flask
 flask-sqlalchemy
-flask-login
+flask-email
 flask-restful
 passlib
 bcrypt

@@ -44,7 +44,6 @@ class User(DB.Model):
     def modify(self, data):
         if 'password' in data:
             self.password_hash = bcrypt.hash(data['password'])
-            del data['password']
         if 'name' in data:
             self.name = data['name']
         if 'username' in data:
